@@ -22,7 +22,7 @@ formal IM8 portal submission.
 
 **Outputs produced in the assessed codebase:**
 - `SSP.md` — System Security Plan (IM8-ready)
-- `ASSESSMENT-REPORT.md` — Compliance matrix (✅ ❌ ⚠️ 🔵 ❓) + prioritised gap report (🔴 🟠 🟡 🟢)
+- `ASSESSMENT-REPORT.md` — Compliance matrix (✅ ❌ 🔵 ❓) + prioritised gap report (🔴 🟠 🟡)
 
 ---
 
@@ -210,17 +210,17 @@ Use this exact structure:
 
 ## Compliance Summary
 
-| Domain | Controls | ✅ | ❌ | ⚠️ | 🔵 | ❓ |
-|--------|----------|----|----|----|----|-----|
-| AC – Access Control | | | | | | |
-| AS – Application Security | | | | | | |
-| SD – Secure Development | | | | | | |
-| LM – Logging & Monitoring | | | | | | |
-| NS – Network Security | | | | | | |
-| SC – Software Supply Chain | | | | | | |
-| DP – Data Protection | | | | | | |
-| PM – Security Programme Mgmt | | | | | | |
-| **TOTAL** | **N** | **N** | **N** | **N** | **N** | **N** |
+| Domain | Controls | ✅ | ❌ | 🔵 | ❓ |
+|--------|----------|----|----|----|----|
+| AC – Access Control | | | | | |
+| AS – Application Security | | | | | |
+| SD – Secure Development | | | | | |
+| LM – Logging & Monitoring | | | | | |
+| NS – Network Security | | | | | |
+| SC – Software Supply Chain | | | | | |
+| DP – Data Protection | | | | | |
+| PM – Security Programme Mgmt | | | | | |
+| **TOTAL** | **N** | **N** | **N** | **N** | **N** |
 
 **Overall compliance score:** X% *(of assessed controls — excludes N/A and Unassessed)*
 
@@ -229,7 +229,6 @@ Use this exact structure:
 |--------|---------|
 | ✅ | **Compliant** — clear evidence of implementation found in codebase |
 | ❌ | **Non-Compliant** — requirement absent, violated, or counterevidence found |
-| ⚠️ | **Partial** — some implementation present but gaps remain |
 | 🔵 | **N/A** — not applicable given system type or classification |
 | ❓ | **Unassessed** — insufficient evidence; manual review required |
 
@@ -239,14 +238,14 @@ Use this exact structure:
 
 | Control ID | Domain | Level | Control Name | Status | Evidence / Finding | Remediation |
 |-----------|--------|-------|-------------|--------|--------------------|-------------|
-| AC-1 | Access Control | L0 | Default Credentials | ✅/❌/⚠️/🔵/❓ | [what was found] | [fix] |
+| AC-1 | Access Control | L0 | Default Credentials | ✅/❌/🔵/❓ | [what was found] | [fix] |
 | ... | | | | | | |
 
 ---
 
 ## Gap Report
 
-*Only controls assessed as ❌ Non-Compliant or ⚠️ Partial appear here.*
+*Only controls assessed as ❌ Non-Compliant appear here.*
 
 ### 🔴 Critical — Level 0 Non-Compliant (fix before IM8 submission)
 
@@ -254,17 +253,12 @@ Use this exact structure:
 |---|-----------|-------|---------|-----------------|--------|
 | 1 | [ID] | L0 | [what is missing/broken] | [specific fix] | Low / Med / High |
 
-### 🟠 High — Level 0 Partial, or Level 1 Non-Compliant
+### 🟠 High — Level 1 Non-Compliant
 
 | # | Control ID | Level | Finding | Recommended Fix | Effort |
 |---|-----------|-------|---------|-----------------|--------|
 
-### 🟡 Medium — Level 1 Partial, or Level 2 Non-Compliant
-
-| # | Control ID | Level | Finding | Recommended Fix | Effort |
-|---|-----------|-------|---------|-----------------|--------|
-
-### 🟢 Low — Level 2 Partial
+### 🟡 Medium — Level 2 Non-Compliant
 
 | # | Control ID | Level | Finding | Recommended Fix | Effort |
 |---|-----------|-------|---------|-----------------|--------|
@@ -304,7 +298,7 @@ GenAI:        [Yes / No]                      Dev model:  [In-house / Outsourced
 
 Controls assessed: N
   ✅ Compliant:      N     ❌ Non-Compliant:  N
-  ⚠️  Partial:        N     🔵 N/A:            N     ❓ Unassessed: N
+  🔵 N/A:            N     ❓ Unassessed:     N
 Compliance score: X% (of assessed controls)
 
 Files written:

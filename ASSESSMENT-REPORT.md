@@ -16,18 +16,18 @@ The assessed codebase is in an early/bootstrap stage with no application code, C
 
 ## Compliance Summary
 
-| Domain | Controls | ✅ | ❌ | ⚠️ | 🔵 | ❓ |
-|--------|----------|:--:|:--:|:--:|:--:|:--:|
-| AC – Access Control | 7 | 0 | 0 | 0 | 4 | 3 |
-| AS – Application Security | 7 | 0 | 0 | 0 | 4 | 3 |
-| SD – Secure Development | 7 | 0 | 2 | 0 | 4 | 1 |
-| LM – Logging & Monitoring | 6 | 0 | 0 | 0 | 4 | 2 |
-| NS – Network Security | 6 | 0 | 0 | 0 | 4 | 2 |
-| SC – Software Supply Chain | 6 | 0 | 1 | 0 | 4 | 1 |
-| DP – Data Protection | 6 | 0 | 0 | 0 | 4 | 2 |
-| PM – Security Programme Mgmt | 6 | 0 | 2 | 0 | 4 | 0 |
-| GenAI – AI Controls | 5 | 0 | 0 | 0 | 3 | 2 |
-| **TOTAL** | **56** | **0** | **5** | **0** | **35** | **16** |
+| Domain | Controls | ✅ | ❌ | 🔵 | ❓ |
+|--------|----------|:--:|:--:|:--:|:--:|
+| AC – Access Control | 7 | 0 | 0 | 4 | 3 |
+| AS – Application Security | 7 | 0 | 0 | 4 | 3 |
+| SD – Secure Development | 7 | 0 | 2 | 4 | 1 |
+| LM – Logging & Monitoring | 6 | 0 | 0 | 4 | 2 |
+| NS – Network Security | 6 | 0 | 0 | 4 | 2 |
+| SC – Software Supply Chain | 6 | 0 | 1 | 4 | 1 |
+| DP – Data Protection | 6 | 0 | 0 | 4 | 2 |
+| PM – Security Programme Mgmt | 6 | 0 | 2 | 4 | 0 |
+| GenAI – AI Controls | 5 | 0 | 0 | 3 | 2 |
+| **TOTAL** | **56** | **0** | **5** | **35** | **16** |
 
 **Overall compliance score: 0%** *(0 of 5 definitively-assessed controls are compliant)*
 *16 L0 controls are ❓ Unassessed — no application code present to evaluate against*
@@ -37,7 +37,6 @@ The assessed codebase is in an early/bootstrap stage with no application code, C
 |--------|---------|
 | ✅ | **Compliant** — clear evidence of implementation found in codebase |
 | ❌ | **Non-Compliant** — requirement absent, violated, or counterevidence found |
-| ⚠️ | **Partial** — some implementation present but gaps remain |
 | 🔵 | **N/A** — not applicable (L1/L2 controls not required at Low risk level, or feature not present) |
 | ❓ | **Unassessed** — insufficient evidence; no application code to evaluate; manual review required |
 
@@ -47,8 +46,7 @@ The assessed codebase is in an early/bootstrap stage with no application code, C
 
 | Control ID | Domain | Level | Control Name | Status | Evidence / Finding | Remediation |
 |:----------|:-------|:-----:|:------------|:------:|:-------------------|:------------|
-| AC-1 | Access Control | L0 | Default Credentials | ❓ | No application code or config files found. No hardcoded credentials detected (positive). Cannot confirm first-login credential-change enforcement without app code. | Implement and verify once auth layer is built |
-| AC-2 | Access Control | L0 | Least Privilege | ❓ | No application code found. No RBAC definitions, route guards, or permission middleware present. | Design and implement RBAC/ABAC before deploying the RAG API |
+| AC-1 | Access Control | L0 | Default Credentials | ❓ | No application code or config files found. No hardcoded credentials detected (positive). Cannot confirm first-login credential-change enforcement without app code. | Implement and verify once auth layer is built || AC-2 | Access Control | L0 | Least Privilege | ❓ | No application code found. No RBAC definitions, route guards, or permission middleware present. | Design and implement RBAC/ABAC before deploying the RAG API |
 | AC-3 | Access Control | L0 | Account Management | ❓ | No application code found. No account lifecycle or deprovisioning logic present. | Define account management process; implement account inventory |
 | AC-4 | Access Control | L1 | Multi-Factor Authentication | 🔵 | N/A — L1 control; not required at Low risk level | Consider implementing for privileged/admin access regardless |
 | AC-5 | Access Control | L1 | Credential Rotation | 🔵 | N/A — L1 control; not required at Low risk level | — |
@@ -108,7 +106,7 @@ The assessed codebase is in an early/bootstrap stage with no application code, C
 
 ## Gap Report
 
-*Only controls assessed as ❌ Non-Compliant appear here. ❓ Unassessed controls are listed separately as requiring manual action.*
+*Only controls assessed as ❌ Non-Compliant appear here. ❓ Unassessed controls require manual action and are listed in the 🟠 section below.*
 
 ---
 
@@ -124,7 +122,7 @@ The assessed codebase is in an early/bootstrap stage with no application code, C
 
 ---
 
-### 🟠 High — Level 0 Unassessed (❓ controls requiring urgent manual verification)
+### 🟠 High — Level 1 Non-Compliant + Level 0 Unassessed (❓ controls requiring urgent manual verification)
 
 *These L0 controls could not be confirmed from code alone. Treat as gaps until verified.*
 
