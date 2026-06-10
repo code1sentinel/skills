@@ -1,40 +1,49 @@
 ---
 name: shift-left-ssp-assessor
 description: >
-  Scan a codebase and generate a Singapore Government IM8/ICT&SS-aligned System Security Plan (SSP)
-  plus a compliance assessment report with matrix and gap analysis. Use when: a team wants to do a
-  shift-left security assessment, check IM8 or ICT&SS compliance, generate an SSP for IM8 submission,
-  assess a project against the Singapore Government control catalog at info.standards.tech.gov.sg,
-  identify security gaps early in development, or evaluate a codebase against government cybersecurity
-  controls. Trigger on: "assess my codebase", "generate SSP", "check IM8 compliance", "shift-left
-  assessment", "security compliance check", "scan for security gaps", "ICT&SS assessment", "government
-  security standards", "control catalog assessment", "IM8 SSP".
+  Assess a codebase for compliance against the Singapore Government ICT&SS control catalog and
+  generate a compliance matrix with a prioritised gap report. Use when: a team wants to check
+  IM8 compliance, assess security controls in a codebase, identify compliance gaps, generate a
+  compliance report for a cloud or on-premises system, evaluate against info.standards.tech.gov.sg
+  controls, or do a shift-left compliance assessment. Trigger on: "assess compliance", "check IM8
+  compliance", "security assessment", "compliance matrix", "gap report", "scan for security gaps",
+  "ICT&SS assessment", "control catalog assessment", "shift-left assessment", "assess my codebase".
 ---
 
 # Shift-Left SSP Assessor
 
-Scan a codebase to generate a Singapore Government IM8-aligned **System Security Plan (SSP)** and a
-**compliance assessment report** against the control catalog at
-[info.standards.tech.gov.sg](https://info.standards.tech.gov.sg/control-catalog/).
+Assess a codebase against the Singapore Government ICT&SS control catalog at
+[info.standards.tech.gov.sg](https://info.standards.tech.gov.sg/control-catalog/) and produce a
+compliance matrix with a prioritised gap report.
 
-Designed for third parties to run at project start for proactive, shift-left compliance — before
-formal IM8 portal submission.
+**Output:** `ASSESSMENT-REPORT.md` written alongside `SSP.md` (or at the codebase root)
 
-**Outputs produced in the assessed codebase:**
-- `SSP.md` — System Security Plan (IM8-ready)
-- `ASSESSMENT-REPORT.md` — Compliance matrix (✅ ❌ 🔵 ❓) + prioritised gap report (🔴 🟠 🟡)
+> **Pair with** `/shift-left-ssp-creator` to generate the SSP document first, then run this skill
+> to assess it.
+
+**Status symbols:**
+| Symbol | Meaning |
+|--------|---------|
+| ✅ | **Compliant** — clear evidence of implementation found in codebase |
+| ❌ | **Non-Compliant** — requirement absent, violated, or counterevidence found |
+| 🔵 | **N/A** — not applicable given system type or risk level |
+| ❓ | **Unassessed** — insufficient evidence; manual review required |
 
 ---
 
 ## Workflow
 
-Create a todo checklist at the start and work through each step in order.
+Create a checklist and work through each step in order.
 
 ---
 
 ### Step 1 — Classify the System
 
-Ask all four questions in a single message. Do not proceed to Step 2 until you have answers.
+First, check whether `SSP.md` exists in the codebase root or `security/` directory.
+If it contains a **System Classification** table, read the four values from there and skip the
+questions — confirm the values with the user in one line before proceeding.
+
+Otherwise, ask all four questions in a single message:
 
 ---
 
@@ -56,29 +65,23 @@ Ask all four questions in a single message. Do not proceed to Step 2 until you h
 
 ---
 
-**Why each answer matters:**
+**Control scope by risk level:**
 
-| Q | Impact |
-|---|--------|
-| Q1 | Selects the SSP template and scopes applicable control domains (e.g. network security differs for SaaS) |
-| Q2 | Determines control levels: Low → L0 only required; Medium → L0+L1; High/CII → L0+L1+L2 assessed |
-| Q3 | Elevates scrutiny on SC (Software Supply Chain) and PM controls; offshore adds data sovereignty checks |
-| Q4 | Triggers GenAI-specific SSP template at `info.standards.tech.gov.sg/ssp/gen-ai/` and additional controls |
+| Level | Label | Obligation | Assessed? |
+|-------|-------|------------|-----------|
+| **L0** | Must-Have | Mandatory for ALL systems | Always |
+| **L1** | Should-Have | Strongly recommended; expected Medium+ | Medium / High / CII |
+| **L2** | Good-to-Have | Best practice; High and CII | High / CII only |
 
-**Control level reference:**
-
-| Level | Label | Obligation |
-|-------|-------|------------|
-| **L0** | Must-Have | Mandatory for ALL systems regardless of risk |
-| **L1** | Should-Have | Strongly recommended; expected from Medium-risk systems upward |
-| **L2** | Good-to-Have | Best-practice; targeted at High and CII systems |
+Low risk: L0 assessed; L1 and L2 marked 🔵 N/A
+Medium risk: L0 + L1 assessed; L2 marked 🔵 N/A
+High / CII: L0 + L1 + L2 all assessed
 
 ---
 
 ### Step 2 — Fetch Live Control Catalog
 
-The source of truth is **info.standards.tech.gov.sg**. Fetch the live catalog for each domain using
-WebFetch. Run all fetches in parallel:
+Fetch the current catalog from the source of truth. Run all fetches in parallel:
 
 ```
 https://info.standards.tech.gov.sg/control-catalog/cybersecurity/ac/   (Access Control)
@@ -91,27 +94,23 @@ https://info.standards.tech.gov.sg/control-catalog/cybersecurity/dp/   (Data Pro
 https://info.standards.tech.gov.sg/control-catalog/cybersecurity/pm/   (Security Programme Mgmt)
 ```
 
-If Q4 = Yes, also fetch:
-```
-https://info.standards.tech.gov.sg/ssp/gen-ai/
-```
+If Q4 = Yes, also fetch: `https://info.standards.tech.gov.sg/ssp/gen-ai/`
 
-**If any domain returns 403 or fails to load:**
+**If any domain returns 403 or fails:**
 > 📋 Load the fallback catalog: read `./references/control-catalog.md`
 
-Note which domains used the live catalog vs. the fallback. Include this in the final report so
-the assessor knows to re-verify against the live site when access is available.
+Note per-domain whether live or fallback was used — include this in the assessment report.
 
 ---
 
-### Step 3 — Scan Codebase
+### Step 3 — Scan Codebase for Control Evidence
 
-Run Glob and Grep searches for each control domain. Maximise parallel calls. The goal is to
-find *evidence for or against* each control — not to exhaustively catalogue every file.
+Run Glob and Grep searches per control domain. Maximise parallel calls. Look for *evidence for
+or against* each control — not an exhaustive file listing.
 
 #### AC — Access Control
-- `Grep` for hardcoded credentials: patterns like `password\s*=\s*["'][^"']+`, `api_key\s*=`, `"admin"`, `"root"`, `"changeme"`, `"password123"`
-- `Glob` for `.env*` files; check if `.env` is listed in `.gitignore`
+- `Grep` for hardcoded credentials: `password\s*=\s*["'][^"']+`, `api_key\s*=`, `"admin"`, `"root"`, `"changeme"`, `"password123"`
+- `Glob` for `.env*` files; check if `.env` is in `.gitignore`
 - `Grep` for auth framework imports: `passport`, `oauth`, `jwt`, `oidc`, `spring-security`, `devise`, `authlib`, `casbin`
 - Look for RBAC / permission check middleware in route handlers
 - `Grep` for MFA patterns: `totp`, `otp`, `mfa`, `2fa`, `authenticator`
@@ -123,82 +122,74 @@ find *evidence for or against* each control — not to exhaustively catalogue ev
 - `Grep` for ORM usage (safer): `sequelize`, `sqlalchemy`, `hibernate`, `activerecord`, `prisma`, `gorm`, `typeorm`
 - `Grep` for output encoding: `DOMPurify`, `htmlspecialchars`, `encodeURIComponent`, `escapeHtml`, `markupsafe`
 - `Grep` for secrets in source: `sk-[a-zA-Z0-9]{20,}`, `AKIA[A-Z0-9]{16}`, `xox[baprs]-`, `ghp_`, `-----BEGIN (RSA|EC|OPENSSH|PGP)`
-- `Grep` for Content-Security-Policy header configuration
+- `Grep` for Content-Security-Policy configuration
 
 #### SD — Secure Development
-- `Glob` for CI/CD configs: `.github/workflows/*.yml`, `.gitlab-ci.yml`, `Jenkinsfile`, `azure-pipelines.yml`, `.circleci/config.yml`, `bitbucket-pipelines.yml`
-- In any CI config found, check for: SAST (semgrep, codeql, sonarqube, checkmarx, veracode), secret scanning (gitleaks, trufflehog, detect-secrets), dependency scanning (snyk, dependabot, trivy, grype)
+- `Glob` for CI/CD configs: `.github/workflows/*.yml`, `.gitlab-ci.yml`, `Jenkinsfile`, `azure-pipelines.yml`, `.circleci/config.yml`
+- In any CI config found, check for: SAST (semgrep, codeql, sonarqube), secret scanning (gitleaks, trufflehog), dependency scanning (snyk, dependabot, trivy)
 - `Glob` for secret-scanning config: `.gitleaks.toml`, `.secrets.baseline`, `.pre-commit-config.yaml`
 - `Glob` for dependency update config: `.github/dependabot.yml`, `renovate.json`, `.renovaterc`
-- `Glob` for containers: `Dockerfile`, `docker-compose*.yml` — check for pinned base image tags vs. `latest`
-- `Grep` for branch protection hints in CI: `required_status_checks`, `branch-protection`, `protected`
+- `Glob` for containers: `Dockerfile`, `docker-compose*.yml` — check for pinned base image tags
+- `Grep` for branch protection hints: `required_status_checks`, `branch-protection`
 
 #### LM — Logging & Monitoring
 - `Grep` for logging framework imports: `winston`, `pino`, `morgan`, `log4j`, `logback`, `structlog`, `logging`, `slog`, `zap`, `zerolog`
-- `Grep` for security event logging: `auth`, `login`, `logout`, `unauthorized`, `forbidden`, `access denied`, `audit`
-- `Grep` for structured/JSON logging: `JSON.stringify`, `json_logs`, `format: json`
-- `Glob` for monitoring configs: `prometheus.yml`, `grafana/`, `datadog.yaml`, `newrelic.yml`, `otel-collector*`, `opentelemetry*`
+- `Grep` for security event logging: `auth`, `login`, `logout`, `unauthorized`, `forbidden`, `audit`
+- `Grep` for structured/JSON logging: `json_logs`, `format: json`, `JSON.stringify`
+- `Glob` for monitoring configs: `prometheus.yml`, `grafana/`, `datadog.yaml`, `newrelic.yml`, `otel*`
 - `Glob` for log shipping: `fluent*.conf`, `filebeat.yml`, `logstash*.conf`
 
 #### NS — Network Security
 - `Grep` for TLS config: `ssl_cert`, `tls_cert`, `tlsMinVersion`, `SSLContext`, `ssl.wrap_socket`
-- `Grep` for HTTPS enforcement: `301`, `https_only`, `HSTS`, `Strict-Transport-Security`, `ssl_redirect`
-- `Grep` for security headers middleware: `helmet`, `SecurityHeadersMiddleware`, `cors(`, `CORS`
-- `Grep` for non-TLS hardcoded URLs: `http://` (excluding localhost and development URLs)
-- `Glob` for IaC firewall/security group configs: `*.tf`, `*.cfn.yml`, `cloudformation*.json`, `security_group`
+- `Grep` for HTTPS enforcement: `https_only`, `HSTS`, `Strict-Transport-Security`, `ssl_redirect`
+- `Grep` for security headers middleware: `helmet`, `SecurityHeadersMiddleware`, `cors(`
+- `Grep` for non-TLS hardcoded URLs: `http://` (excluding localhost and dev URLs)
+- `Glob` for IaC security group configs: `*.tf`, `*.cfn.yml`, `cloudformation*.json`
 - `Glob` for WAF config: `waf*.yml`, `waf*.json`, `modsecurity*`
 
 #### SC — Software Supply Chain
-- `Glob` for lock files: `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `requirements.txt`, `Pipfile.lock`, `poetry.lock`, `go.sum`, `Cargo.lock`, `Gemfile.lock`, `composer.lock`
-- Check a sample of dependencies in lock files for version pinning (no `*` or `latest`)
+- `Glob` for lock files: `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `requirements.txt`, `Pipfile.lock`, `poetry.lock`, `go.sum`, `Cargo.lock`, `Gemfile.lock`
+- Check a sample of dependencies for version pinning (no `*` or `latest`)
 - `Glob` for SBOM generation: `syft*`, `cyclonedx*`, `spdx*` in CI configs or scripts
-- `Grep` for container scanning in CI: `trivy`, `snyk container`, `grype`, `clair`, `anchore`
-- `Grep` for package signing: `npm audit signatures`, `cosign`, `sigstore`
-- If Q3 = Outsourced (Offshore or Mixed): look for vendor security agreements or data processing agreements in `docs/`
+- `Grep` for container scanning in CI: `trivy`, `snyk container`, `grype`, `clair`
+- `Grep` for package signing: `cosign`, `sigstore`
+- If Q3 = Outsourced (Offshore or Mixed): look for vendor security agreements in `docs/`
 
 #### DP — Data Protection
 - `Grep` for encryption lib usage: `crypto`, `cryptography`, `KMSClient`, `SecretManagerClient`, `bcrypt`, `argon2`, `AES`, `fernet`
-- `Grep` for PII-related field names in models/schemas: `email`, `phone`, `nric`, `passport`, `dob`, `date_of_birth`, `address`, `full_name`, `national_id`
-- `Grep` for data masking / redaction: `mask`, `redact`, `anonymize`, `pseudonymize`, `[REDACTED]`
+- `Grep` for PII field names: `email`, `phone`, `nric`, `passport`, `dob`, `date_of_birth`, `address`, `full_name`, `national_id`
+- `Grep` for data masking: `mask`, `redact`, `anonymize`, `pseudonymize`
 - `Glob` for backup/retention config: `backup*.yml`, `backup*.sh`, `retention*`
 - Check `README.md` or `docs/` for data classification statements
 
 #### PM — Security Programme Management
-- `Glob` for security policy files: `SECURITY.md`, `.github/SECURITY.md`, `docs/security*`, `security/`
+- `Glob` for `SECURITY.md`, `.github/SECURITY.md`, `docs/security*`
 - `Glob` for incident response docs: `docs/runbook*`, `docs/incident*`, `runbooks/`, `playbooks/`
 - `Glob` for `CHANGELOG.md` — check for security patch entries
 - `Grep` in `README.md` for security sections
-- If Q3 = Outsourced: look for vendor/third-party risk management docs in `docs/`
+
+#### GenAI Controls (if Q4 = Yes)
+- `Grep` for prompt injection defences: `sanitize`, `guardrail`, `content_filter`, `moderate`, `injection`
+- `Grep` for PII scrubbing before LLM calls: `scrub`, `strip_pii`, `anonymize`, `redact`
+- `Grep` for LLM output filtering or validation
+- `Grep` for AI-specific rate limiting or abuse detection
+- `Grep` for AI audit logging patterns: `log.*prompt`, `log.*response`, `ai_audit`
 
 ---
 
-### Step 4 — Generate SSP
+### Step 4 — Generate Assessment Report
 
-Write `SSP.md` in the root of the assessed codebase (or `security/SSP.md` if a `security/` dir exists).
-
-> 📋 Load the SSP section template: read `./references/ssp-template.md`
-
-Populate each section using codebase findings from Step 3 and the classification answers from Step 1.
-Where information cannot be inferred from the codebase, use a placeholder:
-`[TO BE COMPLETED BY SYSTEM OWNER: <guidance text>]`
-
----
-
-### Step 5 — Generate Assessment Report
-
-Write `ASSESSMENT-REPORT.md` in the same directory as `SSP.md`.
+Write `ASSESSMENT-REPORT.md` alongside `SSP.md`, or at the codebase root if no SSP exists yet.
 
 Use this exact structure:
-
----
 
 ```markdown
 # Assessment Report — [System Name]
 
 > **Generated:** [date]
 > **Assessed against:** Singapore Government ICT&SS Control Catalog (info.standards.tech.gov.sg)
-> **SSP type:** [Cloud Low/Medium/High / On-Premises / SaaS / GenAI]
-> **Catalog source:** Live (fetched [date]) | Fallback (./references/control-catalog.md) — [note per domain]
+> **SSP type:** [Cloud Low-Risk / Medium-Risk / High-Risk / On-Premises / SaaS / + GenAI]
+> **Catalog source:** Live (fetched [date]) | Fallback (`./references/control-catalog.md`) — [note per domain]
 
 ---
 
@@ -229,7 +220,7 @@ Use this exact structure:
 |--------|---------|
 | ✅ | **Compliant** — clear evidence of implementation found in codebase |
 | ❌ | **Non-Compliant** — requirement absent, violated, or counterevidence found |
-| 🔵 | **N/A** — not applicable given system type or classification |
+| 🔵 | **N/A** — not applicable given system type or risk level |
 | ❓ | **Unassessed** — insufficient evidence; manual review required |
 
 ---
@@ -238,22 +229,21 @@ Use this exact structure:
 
 | Control ID | Domain | Level | Control Name | Status | Evidence / Finding | Remediation |
 |-----------|--------|-------|-------------|--------|--------------------|-------------|
-| AC-1 | Access Control | L0 | Default Credentials | ✅/❌/🔵/❓ | [what was found] | [fix] |
+| AC-1 | Access Control | L0 | Default Credentials | ✅/❌/🔵/❓ | [what was found] | [fix or —] |
 | ... | | | | | | |
 
 ---
 
 ## Gap Report
 
-*Only controls assessed as ❌ Non-Compliant appear here.*
+*Only ❌ Non-Compliant controls appear here. ❓ Unassessed controls are listed in 🟠 below.*
 
-### 🔴 Critical — Level 0 Non-Compliant (fix before IM8 submission)
+### 🔴 Critical — Level 0 Non-Compliant (must fix before IM8 submission)
 
 | # | Control ID | Level | Finding | Recommended Fix | Effort |
 |---|-----------|-------|---------|-----------------|--------|
-| 1 | [ID] | L0 | [what is missing/broken] | [specific fix] | Low / Med / High |
 
-### 🟠 High — Level 1 Non-Compliant
+### 🟠 High — Level 1 Non-Compliant + Level 0 Unassessed
 
 | # | Control ID | Level | Finding | Recommended Fix | Effort |
 |---|-----------|-------|---------|-----------------|--------|
@@ -268,18 +258,18 @@ Use this exact structure:
 ## Assessment Notes
 
 - Controls marked ❓ require manual review by a qualified security practitioner
-- This assessment is based on static code analysis; runtime behaviour and operational controls (e.g. PM, incident response drills) require separate evaluation
-- Re-run this assessment after addressing 🔴 Critical gaps, before IM8 portal submission
+- This is a static code analysis assessment; runtime behaviour and operational controls require separate evaluation
+- Re-run `/shift-left-ssp-assessor` after addressing 🔴 Critical gaps to verify closure
 - Catalog source: [live or fallback — note any domains that could not be fetched]
 ```
 
 ---
 
-### Step 6 — Commit and Push
+### Step 5 — Commit and Push
 
 ```bash
-git add SSP.md ASSESSMENT-REPORT.md
-git commit -m "Add IM8 shift-left SSP and compliance assessment report"
+git add ASSESSMENT-REPORT.md
+git commit -m "Add IM8 compliance assessment report"
 git push -u origin <current-branch>
 ```
 
@@ -287,22 +277,19 @@ git push -u origin <current-branch>
 
 ## Wrap Up
 
-Present a summary card to the user:
-
 ```
-## Shift-Left Assessment Complete ✅
+## Assessment Complete ✅
 
 System:       [name]
 Deployment:   [Cloud / On-Premises / SaaS]   Risk level: [Low / Medium / High / CII]
 GenAI:        [Yes / No]                      Dev model:  [In-house / Outsourced]
 
-Controls assessed: N
+Controls in scope: N
   ✅ Compliant:      N     ❌ Non-Compliant:  N
   🔵 N/A:            N     ❓ Unassessed:     N
 Compliance score: X% (of assessed controls)
 
-Files written:
-  📄 SSP.md               — System Security Plan (ready for IM8 portal)
+File written:
   📊 ASSESSMENT-REPORT.md — Compliance matrix + gap report
 
 Top critical gaps (Level 0 ❌):
@@ -310,10 +297,10 @@ Top critical gaps (Level 0 ❌):
   2. [Control ID] — ...
 
 Next steps:
-  → Address all 🔴 Critical gaps (Level 0 non-compliant) before IM8 submission
+  → Address all 🔴 Critical gaps (Level 0 ❌) before IM8 portal submission
   → Review ❓ Unassessed controls with your security team
-  → Re-run this skill after remediation to verify gaps are closed
+  → Re-run /shift-left-ssp-assessor after remediation to verify closure
 
-⚠️  This is a shift-left automated assessment based on static code analysis.
-    Operational controls (PM, incident response, security training) need separate manual review.
+⚠️  Static code analysis only. Operational controls (PM, training, incident drills)
+    require separate manual verification.
 ```
