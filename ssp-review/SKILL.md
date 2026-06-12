@@ -1,5 +1,5 @@
 ---
-name: shift-left-ssp-assessor
+name: ssp-review
 description: >
   Assess a codebase for compliance against the Singapore Government ICT&SS control catalog and
   generate a compliance matrix with a prioritised gap report. Use when: a team wants to check
@@ -7,7 +7,8 @@ description: >
   compliance report for a cloud or on-premises system, evaluate against info.standards.tech.gov.sg
   controls, or do a shift-left compliance assessment. Trigger on: "assess compliance", "check IM8
   compliance", "security assessment", "compliance matrix", "gap report", "scan for security gaps",
-  "ICT&SS assessment", "control catalog assessment", "shift-left assessment", "assess my codebase".
+  "ICT&SS assessment", "control catalog assessment", "shift-left assessment", "assess my codebase",
+  "ssp-review", "review SSP".
 ---
 
 # Shift-Left SSP Assessor
@@ -18,7 +19,7 @@ compliance matrix with a prioritised gap report.
 
 **Output:** `ASSESSMENT-REPORT.md` written alongside `SSP.md` (or at the codebase root)
 
-> **Pair with** `/shift-left-ssp-creator` to generate the SSP document first, then run this skill
+> **Pair with** `/ssp-create` to generate the SSP document first, then run this skill
 > to assess it.
 
 **Status symbols:**
@@ -259,7 +260,7 @@ Use this exact structure:
 
 - Controls marked ❓ require manual review by a qualified security practitioner
 - This is a static code analysis assessment; runtime behaviour and operational controls require separate evaluation
-- Re-run `/shift-left-ssp-assessor` after addressing 🔴 Critical gaps to verify closure
+- Re-run `/ssp-review` after addressing 🔴 Critical gaps to verify closure
 - Catalog source: [live or fallback — note any domains that could not be fetched]
 ```
 
@@ -299,7 +300,7 @@ Top critical gaps (Level 0 ❌):
 Next steps:
   → Address all 🔴 Critical gaps (Level 0 ❌) before IM8 portal submission
   → Review ❓ Unassessed controls with your security team
-  → Re-run /shift-left-ssp-assessor after remediation to verify closure
+  → Re-run /ssp-review after remediation to verify closure
 
 ⚠️  Static code analysis only. Operational controls (PM, training, incident drills)
     require separate manual verification.

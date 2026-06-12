@@ -1,12 +1,12 @@
 ---
-name: shift-left-ssp-creator
+name: ssp-create
 description: >
   Scan a codebase and generate a Singapore Government IM8/ICT&SS-aligned System Security Plan
   (SSP). Use when: a team needs to create an SSP for IM8 portal submission, document a system's
   security posture, generate an SSP from a codebase, create a system security plan for a new
   project, or prepare an IM8 SSP document for a cloud or on-premises system. Trigger on:
   "create SSP", "generate SSP", "write SSP", "create system security plan", "IM8 SSP",
-  "document my system", "prepare SSP for IM8", "SSP for cloud system", "shift-left SSP creator".
+  "document my system", "prepare SSP for IM8", "SSP for cloud system", "ssp-create".
 ---
 
 # Shift-Left SSP Creator
@@ -20,7 +20,7 @@ all `[TO BE COMPLETED BY SYSTEM OWNER]` placeholders.
 
 **Output:** `SSP.md` written to the root of the assessed codebase (or `security/SSP.md` if a `security/` dir exists)
 
-> **Pair with** `/shift-left-ssp-assessor` to generate the compliance matrix and gap report after the SSP is created.
+> **Pair with** `/ssp-review` to generate the compliance matrix and gap report after the SSP is created.
 
 ---
 
@@ -168,6 +168,6 @@ Sections completed from codebase:
 Placeholders remaining: N × [TO BE COMPLETED BY SYSTEM OWNER]
   → Open SSP.md and resolve each placeholder before IM8 portal submission
 
-Next step: Run /shift-left-ssp-assessor to generate the compliance matrix
+Next step: Run /ssp-review to generate the compliance matrix
 and gap report against the ICT&SS control catalog.
 ```
