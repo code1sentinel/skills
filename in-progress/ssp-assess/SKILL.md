@@ -1,11 +1,11 @@
 ---
-name: ssp-review
+name: ssp-assess
 description: Assess a codebase against the Singapore Government ICT&SS control catalog and produce
   a compliance matrix with a prioritised gap report. Use when checking IM8 compliance, identifying
   security gaps, generating a compliance report, or evaluating a codebase against
   info.standards.tech.gov.sg controls. Trigger on: "assess compliance", "check IM8", "security
   assessment", "compliance matrix", "gap report", "scan for gaps", "ICT&SS assessment",
-  "control catalog", "shift-left assessment", "assess my codebase", "ssp-review", "review SSP".
+  "control catalog", "shift-left assessment", "assess my codebase", "ssp-assess", "assess SSP".
 ---
 
 ## Context

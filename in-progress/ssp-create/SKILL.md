@@ -61,13 +61,13 @@ curl -s https://info.standards.tech.gov.sg/ssp/ | head -200
 - Never describe architecture that isn't evidenced in a specific file — cite it by path
 - Every unknown value gets `[TO BE COMPLETED BY SYSTEM OWNER: <specific guidance>]` — never leave a blank field
 - If GenAI = Yes, add a GenAI subsection in both Architecture (§2) and Data Flows (§4)
-- The System Classification table (Q1–Q4) must always be present — the `/ssp-review` skill reads it
+- The System Classification table (Q1–Q4) must always be present — the `/ssp-assess` skill reads it
 - Never use generic filler like "standard security practices apply" — be specific or use a placeholder
-- Do not assess compliance — that belongs to `/ssp-review`
+- Do not assess compliance — that belongs to `/ssp-assess`
 
 ## Structure
 
 1. Write `SSP.md` to repo root (or `security/SSP.md` if `security/` exists)
 2. Sections in order: System Overview → System Classification table → Architecture → Technology Stack → Data Flows → Control Implementation Summary → Residual Risks → Review & Approval
 3. Commit: `git add SSP.md && git commit -m "Add IM8 SSP (shift-left draft)" && git push -u origin <branch>`
-4. Wrap-up one-liner: placeholder count, file path, and prompt to run `/ssp-review`
+4. Wrap-up one-liner: placeholder count, file path, and prompt to run `/ssp-assess`
