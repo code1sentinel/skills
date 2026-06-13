@@ -19,6 +19,32 @@ Ask these five questions before running any commands — do not proceed until al
 - **Q4 Cloud footprint:** None (on-prem only) | AWS | Azure | GCP | Multi-cloud | Hybrid
 - **Q5 AI / GenAI systems:** Yes — describe briefly | No
 
+After collecting Q1–Q5, invite the user to upload supporting artifacts before proceeding:
+
+> **Optional — upload evidence artifacts now.**
+> Attach any documents that demonstrate compliance with CTM domain criteria. Accepted formats: PDF, DOCX, XLSX, images (PNG/JPG), or plain text. Useful uploads include:
+>
+> | CTM Domain | Example artifacts |
+> |---|---|
+> | Cyber Governance & Oversight | Information security policy, ISMS scope statement, board risk appetite statement, org chart with security roles |
+> | Cyber Risk Management | Risk register, risk assessment report, BIA, threat model |
+> | Cyber Security Management | Pentest / vulnerability scan reports, patch management policy, MFA config screenshots, SIEM/logging architecture diagram, backup schedule, DR test results |
+> | Supply Chain Management | Vendor risk assessment forms, third-party security questionnaires, supplier contracts with security clauses |
+> | Cyber Crisis Management | Incident response plan, BCP/DRP, tabletop exercise records, post-incident review reports |
+>
+> You may upload multiple files. Type **"no uploads"** to skip and rely on automated scans only.
+
+For each uploaded artifact, extract and record the following before running shell scans:
+- File name and stated document type
+- Document owner / author and version/date if present
+- Which CTM domain(s) and criteria it addresses
+- Key evidence statements (policy commitments, control descriptions, test outcomes, dates, scope)
+- Any gaps, exceptions, or expiry dates noted within the document itself
+
+Treat uploaded artifacts as primary evidence — they override ❓ (insufficient evidence) for the domains they cover and may upgrade a ❌ to ✅ if the document substantiates the control. Cite every artifact in the report as: *[filename, section/page, date]*.
+
+If a document is password-protected, corrupted, or unreadable, note it as ❓ with reason.
+
 Governance & policy evidence — run all in parallel:
 ```
 find . -not -path './.git/*' \( -iname "security-policy*" -o -iname "infosec-policy*" -o -iname "isms*" -o -iname "acceptable-use*" -o -iname "data-classification*" \) 2>/dev/null | head -10
@@ -78,8 +104,10 @@ grep -r "anthropic\|openai\|langchain\|llama_index\|litellm\|transformers\|bedro
 ## Constraints
 
 - Every CTM domain gets exactly one tier rating: T1 ✅ | T2 ✅ | T3 ✅ | T4 ✅ | T5 ✅ or ❌ (not met) or ❓ (insufficient evidence)
-- ❌ requires a specific file path confirming absence OR a concrete finding — never a guess
-- ❓ only when there is genuinely no evidence to assess (e.g. HR training records not in the repo)
+- ❌ requires a specific file path or artifact citation confirming absence OR a concrete finding — never a guess
+- ❓ only when there is genuinely no evidence in either the repo scans or uploaded artifacts (e.g. training completion records not provided)
+- Uploaded artifacts take precedence over shell-scan inferences — a policy document beats a grepped keyword
+- Never silently ignore an uploaded file; every artifact must appear in the Evidence Index at the top of the report
 - The achieved preparedness tier is the highest tier where ALL domains meet the criteria — a single domain gap caps the tier
 - Never recommend "rewrite from scratch" or "rebuild your security program" — every gap gets a specific, actionable fix with effort estimate (hours/days/weeks)
 - Maximum 15 gap findings, ordered by CTM tier impact (Tier 1 gaps before Tier 2, etc.)
@@ -89,13 +117,14 @@ grep -r "anthropic\|openai\|langchain\|llama_index\|litellm\|transformers\|bedro
 
 ## Structure
 
-1. **Executive summary** — 3 sentences: current preparedness tier, headline blocker, top recommended action
-2. **CTM Tier Readiness Scorecard** — table: Domain × Tier 1–5 columns, cell = ✅ / ❌ / ❓, plus current tier verdict and target tier gap highlighted
-3. **Domain-by-domain findings** — for each of the 5 CTM domains:
-   - Tier achieved (with evidence or absence note)
-   - Specific gaps blocking the next tier
-4. **Gap remediation roadmap** — ordered table: Gap | CTM Domain | Tier Impact | Finding | Recommended Fix | Effort
-5. **Sector-specific callouts** — risks and regulatory overlaps relevant to Q1 sector (e.g. MAS TRM, MOH guidelines, PDPA, CSA CII)
-6. **Next-steps checklist** — ≤ 10 items the team can act on immediately, grouped by Quick Win (< 1 week) / Sprint (1–4 weeks) / Project (> 1 month)
-7. **Write output** to `CTM-assessment.md` at repo root (or alongside `SSP.md` if present)
-8. **Commit:** `git add CTM-assessment.md && git commit -m "Add CTM preparedness assessment report" && git push`
+1. **Evidence Index** — table of every artifact used: Filename | Document Type | Date/Version | CTM Domain(s) | Evidence Quality (Primary / Supporting / Unreadable); list "none uploaded" if user skipped
+2. **Executive summary** — 3 sentences: current preparedness tier, headline blocker, top recommended action
+3. **CTM Tier Readiness Scorecard** — table: Domain × Tier 1–5 columns, cell = ✅ / ❌ / ❓, evidence source tagged (📄 artifact | 🔍 scan | ❓ gap); current tier verdict and target tier gap highlighted
+4. **Domain-by-domain findings** — for each of the 5 CTM domains:
+   - Tier achieved (cite artifact *[filename, section/page]* or scan finding as evidence)
+   - Specific gaps blocking the next tier, distinguishing missing-document gaps from missing-control gaps
+5. **Gap remediation roadmap** — ordered table: Gap | CTM Domain | Tier Impact | Finding | Recommended Fix | Effort
+6. **Sector-specific callouts** — risks and regulatory overlaps relevant to Q1 sector (e.g. MAS TRM, MOH guidelines, PDPA, CSA CII)
+7. **Next-steps checklist** — ≤ 10 items grouped by Quick Win (< 1 week) / Sprint (1–4 weeks) / Project (> 1 month); flag items that can be closed by uploading an existing document the user hasn't shared yet
+8. **Write output** to `CTM-assessment.md` at repo root (or alongside `SSP.md` if present)
+9. **Commit:** `git add CTM-assessment.md && git commit -m "Add CTM preparedness assessment report" && git push`
